@@ -1,15 +1,22 @@
 redis = require 'redis'
-client = redis.createClient()
-REDIS_KEY = 'redis-large-file-test'
+client = redis.createClient "redis://192.168.100.34:6379"
 debug = require('debug')('redis-experiments')
+_ = require 'lodash'
 
-startGet = Date.now()
+REDIS_KEY = 'a-different-key'
+
+
+bigNumber = 70 * 1024 * 1024
+bigData = Array(bigNumber).join("e")
+console.log bigData.length
 
 debug('setting data')
-client.set REDIS_KEY, 'hi', (error) =>
+client.hset REDIS_KEY, 'a', bigData, (error) =>
+  return console.error error if error?
   debug('data set')
   debug ('getting data')
-  client.get REDIS_KEY, (error, data) =>
+  client.hget REDIS_KEY, 'a', (error, data) =>
+    return console.error error if error?
     debug('data got')
     debug(data.length)
     client.unref()
